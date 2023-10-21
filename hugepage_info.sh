@@ -1,18 +1,27 @@
 #!/bin/bash
 
+# Function to display information
+show_info() {
+    local description=$1
+    local file_path=$2
+    local filter_pattern=$3
+
+    echo "==> $description (from $file_path)"
+    if [[ -z "$filter_pattern" ]]; then
+        cat "$file_path"
+    else
+        grep -E "$filter_pattern" "$file_path"
+    fi
+    echo
+}
+
 # Display total number of huge pages
-echo "Total Number of Huge Pages:"
-cat /proc/sys/vm/nr_hugepages
-echo
+show_info "Total Number of Huge Pages" "/proc/sys/vm/nr_hugepages"
 
 # Display the default huge page size
-echo "Huge Page Size:"
-cat /proc/meminfo | grep Hugepagesize | awk '{print $2, $3}'
-echo
+show_info "Huge Page Size" "/proc/meminfo" "Hugepagesize"
 
 # Display the total, free, and used huge pages
-echo "Huge Pages Info:"
-cat /proc/meminfo | grep -E "HugePages_(Total|Free|Used)"
-echo
+show_info "Huge Pages Info" "/proc/meminfo" "HugePages_(Total|Free|Used)"
 
 
