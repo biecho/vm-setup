@@ -1,0 +1,8 @@
+#cloud-config
+chpasswd:
+  list: |
+    ubuntu:mysecretpassword
+  expire: False
+ssh_pwauth: True
+console:
+  output: ttyS0
