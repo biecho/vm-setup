@@ -7,6 +7,3 @@ ssh_pwauth: True
 console:
   output: ttyS0
 
-bootcmd:
-- [ sed, -i, 's/^GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="root=UUID=1f8d0fce-92ad-480e-a35d-25ef2dbf4303 ro serial=tty0 console=ttyS0,115200n8 default_hugepagesz=1G hugepagesz=1G hugepages=1 transparent_hugepage=madvise mitigations=off noibrs noibpb nopti nospectre_v2 nospectre_v1 l1tf=off nospec_store_bypass_disable no_stf_barrier mds=off tsx=on tsx_async_abort=off quiet=0 quiet splash vt.handoff=7"/', /etc/default/grub ]
-- [ update-grub ]
