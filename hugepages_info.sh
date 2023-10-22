@@ -1,35 +1,37 @@
 #!/bin/bash
 
-# Define a function to display content from a specific file.
-read_info() {
+# Define a function to retrieve content from a specific file.
+get_info() {
     local file_path=$1
-    local grep_pattern=$2
-
-    echo "Reading from: $file_path"
-    if [ -z "$grep_pattern" ]; then
-        cat "$file_path"
-    else
-        grep "$grep_pattern" "$file_path"
-    fi
-    echo "--------------------------------------------"
+    cat "$file_path" 2>/dev/null || echo "N/A"
 }
 
-# Read information from /proc/sys/vm and /proc/meminfo
-read_info "/proc/sys/vm/nr_hugepages"
-read_info "/proc/meminfo" "Hugepagesize"
-read_info "/proc/meminfo" "HugePages_"
-
-# Define a function to read all files in a directory.
-read_directory() {
+# Function to print info for a particular hugepages size directory.
+print_hugepages_info() {
     local dir_path=$1
+    local size=${dir_path##*-}  # Extract size from path, e.g., 2048kB
 
-    for file in $(ls $dir_path); do
-        read_info "$dir_path/$file"
-    done
+    echo "Hugepages Size: $size"
+    echo "-----------------------"
+    echo "Total: $(get_info "$dir_path/nr_hugepages")"
+    echo "Free: $(get_info "$dir_path/free_hugepages")"
+    echo "Reserved: $(get_info "$dir_path/resv_hugepages")"
+    echo "Surplus: $(get_info "$dir_path/surplus_hugepages")"
+    echo "Mempolicy: $(get_info "$dir_path/nr_hugepages_mempolicy")"
+    echo "Overcommit: $(get_info "$dir_path/nr_overcommit_hugepages")"
+    echo
 }
 
-# Read information from the hugepages directories.
-read_directory "/sys/kernel/mm/hugepages/hugepages-1048576kB"
-read_directory "/sys/kernel/mm/hugepages/hugepages-2048kB"
+# Print general hugepages info.
+echo "General HugePages Info"
+echo "----------------------"
+echo "System HugePages Size: $(get_info "/proc/meminfo" | grep "Hugepagesize" | awk '{print $2, $3}')"
+echo "Total: $(get_info "/proc/meminfo" | grep "HugePages_Total" | awk '{print $2}')"
+echo "Free: $(get_info "/proc/meminfo" | grep "HugePages_Free" | awk '{print $2}')"
+echo "Reserved: $(get_info "/proc/meminfo" | grep "HugePages_Rsvd" | awk '{print $2}')"
+echo "Surplus: $(get_info "/proc/meminfo" | grep "HugePages_Surp" | awk '{print $2}')"
+echo
 
-
+# Print detailed info for each hugepages size.
+print_hugepages_info "/sys/kernel/mm/hugepages/hugepages-1048576kB"
+print_hugepages_info "/sys/kernel/mm/hugepages/hugepages-2048kB"
