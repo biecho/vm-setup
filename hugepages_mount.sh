@@ -1,26 +1,29 @@
 #!/bin/bash
 
-# Configuration variables
+# Constants for the hugetlbfs
 MOUNT_POINT="/mnt/huge"
-HUGE_PAGE_SIZE_GB=1
-HUGE_PAGE_SIZE_BYTES=$((HUGE_PAGE_SIZE_GB * 1024 * 1024 * 1024))
-LIMIT_SIZE="1G"  # This can be adjusted if you want to set a different size limit
+PAGE_SIZE_BYTES="1073741824" # 1GB
+LIMIT_SIZE="1G"
 
-# Ensure the mount point exists
+# Create the mount point if it doesn't exist.
 if [ ! -d "$MOUNT_POINT" ]; then
     echo "Creating mount point: $MOUNT_POINT"
     mkdir -p "$MOUNT_POINT"
 fi
 
-# Mount the hugetlbfs
-# This will use the UID and GID of the user running the script.
-# It sets the huge page size based on configuration and limits the size based on LIMIT_SIZE.
-mount -t hugetlbfs \
-      -o uid=$(id -u),gid=$(id -g),mode=1777,pagesize=$HUGE_PAGE_SIZE_BYTES,size=$LIMIT_SIZE \
+# Current user's UID and GID
+CURRENT_UID=$(id -u)
+CURRENT_GID=$(id -g)
+
+# Mount the hugetlbfs.
+echo "Mounting hugetlbfs with UID=$CURRENT_UID, GID=$CURRENT_GID..."
+
+sudo mount -t hugetlbfs \
+      -o uid=$CURRENT_UID,gid=$CURRENT_GID,mode=1777,pagesize=$PAGE_SIZE_BYTES,size=$LIMIT_SIZE \
       none \
       "$MOUNT_POINT"
 
-# Check if the mount was successful
+# Check if the mount was successful.
 if [ $? -eq 0 ]; then
     echo "hugetlbfs mounted successfully at $MOUNT_POINT"
 else
