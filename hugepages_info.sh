@@ -12,6 +12,7 @@ print_hugepages_info() {
     local size=${dir_path##*-}  # Extract size from path, e.g., 2048kB
 
     echo "Hugepages Size: $size"
+    echo "Source: $dir_path"
     echo "-----------------------"
     echo "Total: $(get_info "$dir_path/nr_hugepages")"
     echo "Free: $(get_info "$dir_path/free_hugepages")"
@@ -25,13 +26,17 @@ print_hugepages_info() {
 # Print general hugepages info.
 echo "General HugePages Info"
 echo "----------------------"
+echo "Source: /proc/meminfo"
 echo "System HugePages Size: $(get_info "/proc/meminfo" | grep "Hugepagesize" | awk '{print $2, $3}')"
 echo "Total: $(get_info "/proc/meminfo" | grep "HugePages_Total" | awk '{print $2}')"
 echo "Free: $(get_info "/proc/meminfo" | grep "HugePages_Free" | awk '{print $2}')"
 echo "Reserved: $(get_info "/proc/meminfo" | grep "HugePages_Rsvd" | awk '{print $2}')"
 echo "Surplus: $(get_info "/proc/meminfo" | grep "HugePages_Surp" | awk '{print $2}')"
 echo
-
+echo "Source: /proc/sys/vm/nr_hugepages"
+echo "Total system-wide hugepages: $(get_info "/proc/sys/vm/nr_hugepages")"
+echo
 # Print detailed info for each hugepages size.
 print_hugepages_info "/sys/kernel/mm/hugepages/hugepages-1048576kB"
 print_hugepages_info "/sys/kernel/mm/hugepages/hugepages-2048kB"
+
